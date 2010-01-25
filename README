@@ -1,0 +1,32 @@
+h1. Name
+
+keytool-importkeypair - A shell script to import key/certificate pairs into an existing Java keystore
+
+h2. Installing
+
+Add @keytool-importkeypair@ to your @PATH@
+
+h2. Usage
+
+_keytool-importkeypair_ [-k keystore] [-p storepass]
+-pk8 pk8 -cert cert -alias key_alias
+
+This script is used to import a key/certificate pair
+into a Java keystore.
+
+If a keystore is not specified then the key pair is imported into
+~/.keystore in the user's home directory.
+
+The passphrase can also be read from stdin.
+
+h2. Example
+
+Adding "Android":http://developer.android.com platform level certificates to the "Android SDK":http://developer.android.com/sdk/.
+
+<pre>
+keytool-importkeypair -k ~/.android/debug.keystore -p android -pk8 platform.pk8 -cert platform.x509.pem -alias platform
+</pre>
+
+h2. Feedback
+
+Shoot me an email at "getfatday@gmail.com":mailto:getfatday@gmail.com with any feedback.
