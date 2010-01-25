@@ -1,5 +1,3 @@
-#!textile
-
 h1. Name
 
 keytool-importkeypair - A shell script to import key/certificate pairs into an existing Java keystore
