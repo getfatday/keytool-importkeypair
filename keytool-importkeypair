@@ -106,7 +106,7 @@ if [ ! -f ${keystore} ]; then
 fi
 
 # Create temp directory ofr key and pkcs12 bundle
-tmpdir=`mktemp -q -d /tmp/${scriptname}.$$`
+tmpdir=`mktemp -q -d /tmp/${scriptname}.XXXX.$$`
 
 if [ $? -ne 0 ]; then
    echo "${scriptname}: Can't create temp directory, exiting..." 1>&2
