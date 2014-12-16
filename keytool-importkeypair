@@ -90,23 +90,23 @@ if [ -z "${pk8}" -o -z "${cert}" -o -z "${alias}" ]; then
 fi
 
 
-for f in ${pk8} ${cert}; do
-    if [ ! -f $f ]; then
+for f in "${pk8}" "${cert}"; do
+    if [ ! -f "$f" ]; then
        echo "${scriptname}: Can't find file $f, exiting..." 1>&2
        exit 1
     fi
 done
 
-if [ ! -f ${keystore} ]; then
-   storedir=`dirname ${keystore}`
-   if [ ! -d ${storedir} -o ! -w ${storedir} ]; then
+if [ ! -f "${keystore}" ]; then
+   storedir=`dirname "${keystore}"`
+   if [ ! -d "${storedir}" -o ! -w "${storedir}" ]; then
       echo "${scriptname}: Can't access ${storedir}, exiting..." 1>&2
       exit 1
    fi
 fi
 
 # Create temp directory ofr key and pkcs12 bundle
-tmpdir=`mktemp -q -d /tmp/${scriptname}.XXXX`
+tmpdir=`mktemp -q -d "/tmp/${scriptname}.XXXX"`
 
 if [ $? -ne 0 ]; then
    echo "${scriptname}: Can't create temp directory, exiting..." 1>&2
@@ -123,17 +123,17 @@ if [ -z "${passphrase}" ]; then
 fi
 
 # Convert PK8 to PEM KEY
-openssl pkcs8 -inform DER -nocrypt -in ${pk8} -out ${key}
+openssl pkcs8 -inform DER -nocrypt -in "${pk8}" -out "${key}"
 
 # Bundle CERT and KEY
-openssl pkcs12 -export -in ${cert} -inkey ${key} -out ${p12} -password pass:${passphrase} -name ${alias}
+openssl pkcs12 -export -in "${cert}" -inkey "${key}" -out "${p12}" -password pass:"${passphrase}" -name "${alias}"
 
 # Print cert
 echo -n "Importing \"${alias}\" with "
-openssl x509 -noout -fingerprint -in ${cert}
+openssl x509 -noout -fingerprint -in "${cert}"
 
 # Import P12 in Keystore
-keytool -importkeystore -deststorepass ${passphrase} -destkeystore ${keystore} -srckeystore ${p12} -srcstoretype PKCS12 -srcstorepass ${passphrase} 
+keytool -importkeystore -deststorepass "${passphrase}" -destkeystore "${keystore}" -srckeystore "${p12}" -srcstoretype PKCS12 -srcstorepass "${passphrase}" 
 
 # Cleanup
 cleanup
