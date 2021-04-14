@@ -1,4 +1,12 @@
-h1. Name
+h1. ALTERNATIVE APPROACH THAT WORKS
+
+$ openssl pkcs8 -inform DER -nocrypt -in platform.pk8 -out platform.pem
+$ openssl pkcs12 -export -in platform.x509.pem -inkey platform.pem -out platform.p12 -password pass:android -name platform 
+$ keytool -importkeystore -deststorepass android -destkeystore test.keystore -srckeystore platform.p12 -srcstoretype PKCS12 -srcstorepass android 
+$ keytool -list -v -keystore test.keystore
+
+
+h2. Name
 
 keytool-importkeypair - A shell script to import key/certificate pairs into an existing Java keystore
 

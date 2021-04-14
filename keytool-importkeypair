@@ -24,19 +24,22 @@ cert=""
 alias=""
 passphrase=""
 tmpdir=""
+nocrypt=""
 
 scriptname=`basename $0`
 
 usage() {
 cat << EOF
 usage: ${scriptname} [-k keystore] [-p storepass]
--pk8 pk8 -cert cert -alias key_alias
+[-nocrypt] -pk8 pk8 -cert cert -alias key_alias
 
 This script is used to import a key/certificate pair
 into a Java keystore.
 
 If a keystore is not specified then the key pair is imported into
 ~/.keystore in the user's home directory.
+
+If -nocrypt flag is not specified, certificate password is required.
 
 The passphrase can also be read from stdin.
 EOF
@@ -74,6 +77,10 @@ while [ $# -gt 0 ]; do
                 -a | -alias | --alias)
                         alias=$2
                         shift 2
+        ;;
+                -nocrypt | -nocrypt | --nocrypt)
+                        nocrypt=true
+                        shift
         ;;
                 *)
                         echo "${scriptname}: Unknown option $1, exiting" 1>&2
@@ -123,7 +130,12 @@ if [ -z "${passphrase}" ]; then
 fi
 
 # Convert PK8 to PEM KEY
-openssl pkcs8 -inform DER -nocrypt -in "${pk8}" -out "${key}"
+if [ -z "${nocrypt}" ]; then
+  echo "Provided certificate is encrypted."
+  openssl pkcs8 -inform DER -in "${pk8}" -out "${key}"
+else
+  openssl pkcs8 -inform DER -nocrypt -in "${pk8}" -out "${key}"
+fi
 
 # Bundle CERT and KEY
 openssl pkcs12 -export -in "${cert}" -inkey "${key}" -out "${p12}" -password pass:"${passphrase}" -name "${alias}"
@@ -133,7 +145,7 @@ echo -n "Importing \"${alias}\" with "
 openssl x509 -noout -fingerprint -in "${cert}"
 
 # Import P12 in Keystore
-keytool -importkeystore -deststorepass "${passphrase}" -destkeystore "${keystore}" -srckeystore "${p12}" -srcstoretype PKCS12 -srcstorepass "${passphrase}" 
+keytool -importkeystore -deststorepass "${passphrase}" -destkeystore "${keystore}" -srckeystore "${p12}" -srcstoretype PKCS12 -srcstorepass "${passphrase}"
 
 # Cleanup
 cleanup
